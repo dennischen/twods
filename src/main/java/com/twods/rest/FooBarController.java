@@ -2,6 +2,8 @@ package com.twods.rest;
 
 import java.util.Random;
 
+import javax.transaction.Transactional;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -37,7 +39,31 @@ public class FooBarController {
 		foo = fooRepo.saveAndFlush(foo);
 		bar = barRepo.saveAndFlush(bar);
 
-		return String.format("%s(%s) - %s(%s)", foo.getFoo(), bar.getBar());
+		String msg = String.format("%s(%s) - %s(%s)", foo.getFoo(), foo.getId(), bar.getBar(), bar.getId());
+
+		System.out.println("1>>>>>"+msg);
+		
+		return msg;
+	}
+	
+	@Transactional
+	@RequestMapping("/foobartx")
+	public String addTx() {
+		Foo foo = new Foo("FooTx-"+r.nextInt());
+		Bar bar = new Bar("BarTx-"+r.nextInt());
+		foo = fooRepo.saveAndFlush(foo);
+		bar = barRepo.saveAndFlush(bar);
+
+		String msg = String.format("%s(%s) - %s(%s)", foo.getFoo(), foo.getId(), bar.getBar(), bar.getId());
+
+		System.out.println("2>>>>>"+msg);
+		
+		if (true) {
+			throw new RuntimeException("doens't roll back");
+		}
+		
+
+		return msg;
 	}
 	
 }

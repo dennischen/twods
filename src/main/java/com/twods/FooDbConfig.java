@@ -18,27 +18,27 @@ import org.springframework.transaction.annotation.EnableTransactionManagement;
 
 @Configuration
 @EnableTransactionManagement
-@EnableJpaRepositories(entityManagerFactoryRef = "entityManagerFactory", basePackages = { "com.twods.foo.repo" })
+@EnableJpaRepositories(entityManagerFactoryRef = "fooEntityManagerFactory", basePackages = { "com.twods.foo.repo" })
 public class FooDbConfig {
 
 	@Primary
-	@Bean(name = "dataSource")
-	@ConfigurationProperties(prefix = "spring.datasource")
+	@Bean(name = {"dataSource", "fooDataSource"})
+	@ConfigurationProperties(prefix = "foo.datasource")
 	public DataSource dataSource() {
 		return DataSourceBuilder.create().build();
 	}
 
 	@Primary
-	@Bean(name = "entityManagerFactory")
+	@Bean(name = {"entityManagerFactory", "fooEntityManagerFactory"})
 	public LocalContainerEntityManagerFactoryBean entityManagerFactory(EntityManagerFactoryBuilder builder,
-			@Qualifier("dataSource") DataSource dataSource) {
+			@Qualifier("fooDataSource") DataSource dataSource) {
 		return builder.dataSource(dataSource).packages("com.twods.foo.domain").persistenceUnit("foo").build();
 	}
 
 	@Primary
-	@Bean(name = "transactionManager")
+	@Bean(name = {"transactionManager", "fooTransactionManager"})
 	public PlatformTransactionManager transactionManager(
-			@Qualifier("entityManagerFactory") EntityManagerFactory entityManagerFactory) {
+			@Qualifier("fooEntityManagerFactory") EntityManagerFactory entityManagerFactory) {
 		return new JpaTransactionManager(entityManagerFactory);
 	}
 }
